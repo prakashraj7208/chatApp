@@ -1,4 +1,4 @@
-FROM openjdk:25-jdk AS build
+FROM openjdk:17-jdk AS build
 WORKDIR /app
 
 COPY pom.xml .
@@ -10,7 +10,7 @@ RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 
 
-FROM openjdk:25-jdk
+FROM openjdk:17-jdk
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
