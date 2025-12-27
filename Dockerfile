@@ -1,19 +1,22 @@
-FROM openjdk:17-jdk AS build
+# Importing JDK and copying required files
+FROM openjdk:19-jdk AS build
 WORKDIR /app
-
 COPY pom.xml .
 COPY src src
+
+# Copy Maven wrapper
 COPY mvnw .
 COPY .mvn .mvn
 
-RUN chmod +x mvnw
+# Set execution permission for the Maven wrapper
+RUN chmod +x ./mvnw
 RUN ./mvnw clean package -DskipTests
 
+# Stage 2: Create the final Docker image using OpenJDK 19
+FROM openjdk:19-jdk
+VOLUME /tmp
 
-FROM openjdk:17-jdk
-WORKDIR /app
-
+# Copy the JAR from the build stage
 COPY --from=build /app/target/*.jar app.jar
-
+ENTRYPOINT ["java","-jar","/app.jar"]
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","app.jar"]
